@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kurdish Quiz - Brainwave</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen">
+    <!-- Animated background elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-4 -left-4 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+        <div class="absolute -bottom-8 -right-4 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-2000"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-emerald-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-4000"></div>
+    </div>
+
+    <div class="relative z-10 flex flex-col items-center justify-center min-h-screen px-4">
+        <!-- Header Stats -->
+        <div class="w-full max-w-4xl mb-6">
+            <div class="flex justify-between items-center">
+                <!-- Timer -->
+                <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl px-6 py-3 shadow-lg">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                        <span class="text-white/90 font-medium">Time:</span>
+                        <span id="timer" class="text-xl font-bold text-red-400">00:10</span>
+                    </div>
+                </div>
+                <!-- Points -->
+                <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl px-6 py-3 shadow-lg">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
+                        <span class="text-white/90 font-medium">Points:</span>
+                        <span id="points" class="text-xl font-bold text-emerald-400">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 md:p-12 shadow-2xl max-w-md w-full">
+            <!-- Title Section -->
+            <div class="text-center mb-8">
+                <h1 class="text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-emerald-400 bg-clip-text text-transparent mb-2">
+                    Kurdish Quiz Game
+                </h1>
+                <p class="text-2xl md:text-3xl text-white/90 font-semibold">Translate the word!</p>
+                <div class="mt-4 px-4 py-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-full border border-purple-400/30">
+                    <span class="text-xl text-purple-300 font-medium">Choose your level to start</span>
+                </div>
+            </div>
+
+            <!-- Game Section -->
+            <div id="game-section" class="flex flex-col items-center" style="display:none;">
+                <div class="mb-4 text-lg text-white/90">
+                    <span id="word-to-translate" class="font-bold text-2xl"></span>
+                </div>
+                <input 
+                    id="answer-input"
+                    type="text" 
+                    placeholder="Type the translation..." 
+                    class="w-full px-6 py-4 bg-white/5 border-2 border-white/20 rounded-2xl text-white placeholder-white/60 focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-400/20 transition-all duration-300 text-lg mb-4"
+                    autocomplete="off"
+                >
+                <button id="submit-answer" class="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-2xl font-semibold text-lg shadow-lg mb-2">Submit</button>
+                <div id="feedback" class="h-6 text-center text-lg font-semibold"></div>
+                <div class="mt-2 text-white/70 text-sm">Word <span id="current-word-number">1</span> of <span id="total-words">50</span></div>
+            </div>
+
+            <!-- Level Selection -->
+            <div id="level-section" class="flex flex-col gap-4">
+                <button class="group relative overflow-hidden bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-8 py-4 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-emerald-500/25 hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300" onclick="startGame('easy')">
+                    <span class="relative z-10">🟢 Easy</span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </button>
+                <button class="group relative overflow-hidden bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-4 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-amber-500/25 hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300" onclick="startGame('medium')">
+                    <span class="relative z-10">🟡 Medium</span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </button>
+                <button class="group relative overflow-hidden bg-gradient-to-r from-red-500 to-red-600 text-white px-8 py-4 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-red-500/25 hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300" onclick="startGame('hard')">
+                    <span class="relative z-10">🔴 Hard</span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-red-400 to-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </button>
+            </div>
+
+            <!-- Decorative Elements -->
+            <div class="mt-8 flex justify-center space-x-2">
+                <div class="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+                <div class="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                <div class="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center">
+            <p class="text-white/60 text-sm">Player: <span id="footer-name">-</span> | Points: <span id="footer-points">0</span></p>
+            <button id="change-name-btn" class="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl text-sm">Change Name</button>
+            <button id="clear-data-btn" class="mt-2 ml-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm">Clear All Data</button>
+            <p class="text-white/60 text-sm mt-2">Choose your difficulty level and start learning!</p>
+        </div>
+
+        <!-- Leaderboard Section -->
+        <div class="mt-8 w-full max-w-2xl">
+            <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 shadow-2xl">
+                <h3 class="text-2xl font-bold text-white text-center mb-4">🏆 Leaderboard</h3>
+                <div id="leaderboard-list" class="space-y-2">
+                    <!-- Leaderboard entries will be added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Name Modal/Section -->
+    <div id="name-section" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
+        <div class="bg-white/90 rounded-3xl p-8 shadow-2xl flex flex-col items-center">
+            <h2 class="text-2xl font-bold mb-4 text-slate-800">Enter your name</h2>
+            <input id="name-input" type="text" placeholder="Your name..." class="w-64 px-4 py-2 rounded-xl border border-slate-300 focus:border-blue-400 focus:outline-none text-lg mb-4" autocomplete="off">
+            <button id="start-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-8 py-2 rounded-xl font-semibold text-lg">Start</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Sample word lists (replace with your own 50 words for each level) ---
+        const words = {
+            easy: [
+                {en: 'cat', ku: 'پشی'}, {en: 'dog', ku: 'سەگ'}, {en: 'sun', ku: 'خۆر'}, {en: 'water', ku: 'ئاو'}, {en: 'book', ku: 'کتێب'},
+                // ... add up to 50 easy words
+            ],
+            medium: [
+                {en: 'mountain', ku: 'چیا'}, {en: 'window', ku: 'پەنجەرە'}, {en: 'teacher', ku: 'مامۆستا'}, {en: 'market', ku: 'بازاڕ'}, {en: 'bridge', ku: 'پرد'},
+                // ... add up to 50 medium words
+            ],
+            hard: [
+                {en: 'responsibility', ku: 'بەرپرسیارێتی'}, {en: 'philosophy', ku: 'فەلسەفە'}, {en: 'environment', ku: 'ژینگە'}, {en: 'revolution', ku: 'شۆڕش'}, {en: 'constitution', ku: 'یاسای بنەڕەتی'},
+                // ... add up to 50 hard words
+            ]
+        };
+
+        let currentLevel = null;
+        let currentWords = [];
+        let currentIndex = 0;
+        let points = 0;
+        let timer = null;
+        let timeLeft = 10;
+        let totalWords = 50;
+        let userName = '';
+
+        // Load saved user data and leaderboard on page load
+        function loadSavedData() {
+            const savedName = localStorage.getItem('quizUserName');
+            if (savedName) {
+                userName = savedName;
+                document.getElementById('footer-name').textContent = userName;
+                // Hide name input if user already has a saved name
+                document.getElementById('name-section').style.display = 'none';
+            } else {
+                // Show name input if no saved name
+                document.getElementById('name-section').style.display = 'flex';
+                document.getElementById('name-input').focus();
+            }
+            loadLeaderboard();
+        }
+
+        // Save user data and update leaderboard
+        function saveUserData() {
+            localStorage.setItem('quizUserName', userName);
+            updateLeaderboard();
+        }
+
+        // Load leaderboard from localStorage
+        function loadLeaderboard() {
+            const leaderboard = JSON.parse(localStorage.getItem('quizLeaderboard') || '[]');
+            displayLeaderboard(leaderboard);
+        }
+
+        // Update leaderboard with current player's score
+        function updateLeaderboard() {
+            let leaderboard = JSON.parse(localStorage.getItem('quizLeaderboard') || '[]');
+            
+            // Find if player already exists
+            const existingPlayerIndex = leaderboard.findIndex(player => player.name === userName);
+            
+            if (existingPlayerIndex !== -1) {
+                // Update existing player's score if it's higher
+                if (points > leaderboard[existingPlayerIndex].points) {
+                    leaderboard[existingPlayerIndex].points = points;
+                }
+            } else {
+                // Add new player
+                leaderboard.push({ name: userName, points: points });
+            }
+            
+            // Sort by points (highest first)
+            leaderboard.sort((a, b) => b.points - a.points);
+            
+            // Save to localStorage
+            localStorage.setItem('quizLeaderboard', JSON.stringify(leaderboard));
+            
+            // Display updated leaderboard
+            displayLeaderboard(leaderboard);
+        }
+
+        // Display leaderboard on page
+        function displayLeaderboard(leaderboard) {
+            const leaderboardList = document.getElementById('leaderboard-list');
+            leaderboardList.innerHTML = '';
+            
+            if (leaderboard.length === 0) {
+                leaderboardList.innerHTML = '<p class="text-white/60 text-center">No scores yet. Be the first!</p>';
+                return;
+            }
+            
+            leaderboard.forEach((player, index) => {
+                const rank = index + 1;
+                const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
+                const isCurrentPlayer = player.name === userName;
+                
+                const playerDiv = document.createElement('div');
+                playerDiv.className = `flex justify-between items-center p-3 rounded-xl ${isCurrentPlayer ? 'bg-blue-500/20 border border-blue-400/30' : 'bg-white/5'}`;
+                playerDiv.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="text-lg font-bold text-white">${medal}</span>
+                        <span class="text-white font-semibold ${isCurrentPlayer ? 'text-blue-300' : ''}">${player.name}</span>
+                    </div>
+                    <span class="text-white font-bold">${player.points} pts</span>
+                `;
+                leaderboardList.appendChild(playerDiv);
+            });
+        }
+
+        // Show name modal on load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Try to load saved data first
+            loadSavedData();
+            
+            // Add event listeners for buttons
+            document.getElementById('start-btn').addEventListener('click', function() {
+                const nameVal = document.getElementById('name-input').value.trim();
+                if (nameVal.length > 0) {
+                    userName = nameVal;
+                    document.getElementById('footer-name').textContent = userName;
+                    document.getElementById('name-section').style.display = 'none';
+                    saveUserData();
+                } else {
+                    document.getElementById('name-input').focus();
+                }
+            });
+            document.getElementById('name-input').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') document.getElementById('start-btn').click();
+            });
+            
+            // Change name button
+            document.getElementById('change-name-btn').addEventListener('click', function() {
+                document.getElementById('name-section').style.display = 'flex';
+                document.getElementById('name-input').value = '';
+                document.getElementById('name-input').focus();
+            });
+            
+            // Clear all data button
+            document.getElementById('clear-data-btn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all saved data? This will remove your name and all scores.')) {
+                    localStorage.removeItem('quizUserName');
+                    localStorage.removeItem('quizLeaderboard');
+                    userName = '';
+                    document.getElementById('footer-name').textContent = '-';
+                    document.getElementById('footer-points').textContent = '0';
+                    document.getElementById('name-section').style.display = 'flex';
+                    document.getElementById('name-input').value = '';
+                    document.getElementById('name-input').focus();
+                    loadLeaderboard(); // This will show "No scores yet"
+                }
+            });
+        });
+
+        function startGame(level) {
+            currentLevel = level;
+            // Shuffle and pick 50 words
+            currentWords = shuffleArray([...words[level]]).slice(0, totalWords);
+            currentIndex = 0;
+            points = 0;
+            document.getElementById('points').textContent = points;
+            document.getElementById('footer-points').textContent = points;
+            document.getElementById('footer-name').textContent = userName;
+            document.getElementById('level-section').style.display = 'none';
+            document.getElementById('game-section').style.display = 'flex';
+            document.getElementById('total-words').textContent = totalWords;
+            nextWord();
+        }
+
+        function nextWord() {
+            if (currentIndex >= currentWords.length) {
+                endGame();
+                return;
+            }
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('answer-input').value = '';
+            document.getElementById('answer-input').focus();
+            document.getElementById('current-word-number').textContent = currentIndex + 1;
+            document.getElementById('word-to-translate').textContent = currentWords[currentIndex].en;
+            // Only reset timer if this is the first word or after a correct answer
+            if (currentIndex === 0 || timeLeft <= 0) {
+                resetTimer();
+            }
+        }
+
+        function checkAnswer() {
+            const userAnswer = document.getElementById('answer-input').value.trim();
+            const correctAnswer = currentWords[currentIndex].ku;
+            if (userAnswer === correctAnswer) {
+                points++;
+                document.getElementById('points').textContent = points;
+                document.getElementById('footer-points').textContent = points;
+                document.getElementById('feedback').textContent = '✅ Correct!';
+                // Reset timer to 10 seconds on correct answer
+                resetTimer();
+                saveUserData();
+            } else {
+                document.getElementById('feedback').textContent = `❌ Wrong! Correct: ${correctAnswer}`;
+                // Don't reset timer on wrong answer - keep current time
+            }
+            currentIndex++;
+            setTimeout(nextWord, 1000);
+        }
+
+        function endGame() {
+            clearInterval(timer);
+            document.getElementById('game-section').style.display = 'none';
+            document.getElementById('level-section').style.display = 'flex';
+            // Save final score and show in footer
+            const finalScore = `${userName}: ${points} points`;
+            document.getElementById('footer-name').textContent = userName;
+            document.getElementById('footer-points').textContent = points;
+            saveUserData();
+            alert(`Game Over, ${userName}! Your final score: ${points} / ${totalWords}`);
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            timeLeft = 10;
+            document.getElementById('timer').textContent = '00:10';
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').textContent = `00:${timeLeft.toString().padStart(2, '0')}`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    // Game over when timer reaches 0
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        // Shuffle helper
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('submit-answer').addEventListener('click', checkAnswer);
+            document.getElementById('answer-input').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') checkAnswer();
+            });
+        });
+    </script>
+</body>
+</html>
